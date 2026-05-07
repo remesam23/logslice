@@ -38,7 +38,18 @@ class ProfileRunner:
         -------
         SliceStats
             Statistics collected during the run.
+
+        Raises
+        ------
+        FileNotFoundError
+            If *log_path* does not exist or is not a file.
         """
+        log_path = Path(log_path)
+        if not log_path.exists():
+            raise FileNotFoundError(f"Log file not found: {log_path}")
+        if not log_path.is_file():
+            raise FileNotFoundError(f"Log path is not a file: {log_path}")
+
         p = self._profile
 
         builder = (
