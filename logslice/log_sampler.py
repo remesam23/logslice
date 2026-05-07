@@ -70,3 +70,30 @@ class LogSampler:
             sample_size=len(sampled),
             step=step,
         )
+
+    def sample_lines(self, lines: List[str]) -> SampleResult:
+        """Filter and sample an already-loaded list of raw log lines.
+
+        Useful when the caller has already read the file into memory or is
+        working with in-memory log data (e.g. from a stream or test fixture).
+        """
+        matched: List[dict] = []
+        for line in lines:
+            line = line.rstrip("\n")
+            parsed = self.parser.parse_line(line)
+            if parsed and self.slicer._in_range(parsed["timestamp"]):
+                matched.append(parsed)
+
+        total = len(matched)
+        if total == 0:
+            return SampleResult(entries=[], total_matched=0, sample_size=0, step=1)
+
+        step = max(1, math.ceil(total / self.max_samples))
+        sampled = matched[::step]
+
+        return SampleResult(
+            entries=sampled,
+            total_matched=total,
+            sample_size=len(sampled),
+            step=step,
+        )
