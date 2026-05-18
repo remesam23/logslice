@@ -24,6 +24,8 @@ class LogMergerBuilder:
         resolved = Path(path)
         if not resolved.exists():
             raise LogMergerBuilderError(f"File not found: {path}")
+        if not resolved.is_file():
+            raise LogMergerBuilderError(f"Path is not a file: {path}")
         self._paths.append(resolved)
         return self
 
