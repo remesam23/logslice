@@ -47,8 +47,18 @@ class LineCounter:
         self._parser = parser
 
     def count_file(self, path: str) -> LineCountResult:
+        """Count and categorise all lines in the log file at *path*.
+
+        Raises:
+            FileNotFoundError: If *path* does not exist.
+            OSError: If the file cannot be opened for reading.
+        """
         result = LineCountResult()
-        with open(path, "r", errors="replace") as fh:
+        try:
+            fh = open(path, "r", errors="replace")
+        except FileNotFoundError:
+            raise FileNotFoundError(f"Log file not found: {path!r}")
+        with fh:
             for raw_line in fh:
                 line = raw_line.rstrip("\n")
                 result.total += 1
